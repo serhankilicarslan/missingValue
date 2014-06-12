@@ -106,7 +106,7 @@
 
 
 <div id="result" style="min-height:350px;" title="Kayıp Veri Analizi Detaylı İnceleme">
-		
+		<h1>Kayıp Veri Analiz Sonucu</h1>
 </div>
 
 <script data-jsfiddle="DateSet">
@@ -177,8 +177,6 @@
 	var collListOptions = [];
 	var sel;
 	var ht;
-
-
 
 	//Analiz Başlangıç aşaması	
 	$('#analizEt').click(function () {
@@ -269,6 +267,7 @@
 							<table width="100%" border="0" cellspacing="0" cellpadding="0">');
 							
 							var s;
+						
 							for(s=0;s<dataColStatus.length;s++){
 								if ((dataColStatus[s]['dataType'] == "numeric") & (dataColStatus[s]['dataStock'] == "fullCol")) {
 									
@@ -280,10 +279,10 @@
 									  </tr>\
 									  <tr>\
 										<td nowrap="nowrap">\
-											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+s+'" value="olcum" id="dateSetType_'+s+'_0" />\
+											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+dataColStatus[s]['id']+'" value="olcum" id="dateSetType_'+dataColStatus[s]['id']+'_0" />\
 												<span style="font-size:12px;">Ölçüm Verisi &nbsp;&nbsp;</span></label></td>\
 										<td nowrap="nowrap" style="font-size:11px;">\
-											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+s+'" value="siniflanmis" id="dateSetType_'+s+'_1" />\
+											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+dataColStatus[s]['id']+'" value="siniflanmis" id="dateSetType_'+dataColStatus[s]['id']+'_1" />\
 												<span style="font-size:12px;">Sınıflanmış Veri</span></label></td>\
 									  </tr>');
 									
@@ -312,10 +311,10 @@
 									  </tr>\
 									  <tr>\
 										<td nowrap="nowrap">\
-											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+s+'" value="olcum" id="dateSetType_'+s+'_0" />\
+											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+dataColStatus[s]['id']+'" value="olcum" id="dateSetType_'+dataColStatus[s]['id']+'_0" />\
 												<span style="font-size:12px;">Ölçüm Verisi &nbsp;&nbsp;</span></label></td>\
 										<td nowrap="nowrap" style="font-size:11px;">\
-											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+s+'" value="siniflanmis" id="dateSetType_'+s+'_1" />\
+											<label><input style="margin-top:-2px;" type="radio" name="dateSetType_'+dataColStatus[s]['id']+'" value="siniflanmis" id="dateSetType_'+dataColStatus[s]['id']+'_1" />\
 												<span style="font-size:12px;">Sınıflanmış Veri</span></label></td>\
 									  </tr>');
 									
@@ -342,14 +341,6 @@
 			else {alert('Öncelikli olarak veri setinizi girmelisiniz.');}
 			
 					
-					//var ht = $('#DateSet').data('handsontable');
-					//ht.setDataAtCell(0, 0, 'a'); // Hücre Değerini düzenleme
-					//alert(ht.getDataAtCell(0,0)); // Gücre Değerini okuma
-					//alert(ht.getDataAtCol(0)); // Sütundaki değerler
-					//alert(ht.getDataAtRow(0)); // Satırdaki değerler
-					//alert(ht.countCols()-40); // Sütün Sayısı
-					//alert(ht.countRows()-30); // Satır Sayısı
-					
 	});
 
 	//Analiz İptal Buttonu
@@ -359,6 +350,7 @@
 		$('#analizEt').show();
 		$('#iptalEt').hide();
 		$('#raporuIncele').hide();
+		$('#result').html('<h1>Kayıp Veri Analiz Sonucu</h1>');
 		fullColList = [];
 		emptyColList = [];
 	
@@ -400,16 +392,31 @@
 			$('#analizAyarlari').empty();
 			$('#devamEt1').hide();
 			
+			
+						
 			 $.each(emptyColList, function( index, emptyColID ) {
 				 
+				for (i=0;i <collListOptions.length ; i++) {
+					if (collListOptions[i]['id']==emptyColID) {
+						emptyColOrderID = i;
+					}
+				}
+				 
 				var dataStructure = "MCAR";
-				
 				//Kayıp veri olan sütun diğer sütunlar ile karşılaştırılıyor
 				$.each(fullColList, function( index, fullColID ) {
-					//alert(ht.getColHeader(emptyColID) + " ile " + ht.getColHeader(fullColID) + " -> " +collListOptions[fullColID]['status']);
+					for (i=0;i <collListOptions.length ; i++) {
+						if (collListOptions[i]['id']==fullColID) {
+							fullColOrderID = i;
+						}
+					}
+					$( "div#result" ).append('<h2>'+ht.getColHeader(emptyColID) + " ile " + ht.getColHeader(fullColID)+' için;</h2>');
+					//alert(ht.getColHeader(emptyColID) + " ile " + ht.getColHeader(fullColID) + " -> " + collListOptions[fullColOrderID]['status']);
 					//Ölçüm verisi ise T-Testi Uygulanıyor
-					if (collListOptions[fullColID]['status'] == "olcum") {
-						//alert (emptyColID + " ile " + fullColID + "arasında t testi uygulanacak");
+					if (collListOptions[fullColOrderID]['status'] == "olcum") {
+						$( "div#result" ).append('<p>'+ht.getColHeader(fullColID)+' sütunundaki veriler ölçüm verisi olduğu için ' + ht.getColHeader(emptyColID) + ' ile ' + ht.getColHeader(fullColID) + ' sütunları arasında t-Testi uygulandı. </p>');
+						
+						//alert (ht.getColHeader(emptyColID) + " ile " + ht.getColHeader(fullColID) + "arasında t testi uygulanacak");
 						var list1 = [],
 							list2 = []
 						;
@@ -440,20 +447,21 @@
 						else {var thesapyeni = bol[0];}
 						
 						//alert (thesapyeni + " - " + tdistr(list1count+list2count-2,.025));
-						
+						$( "div#result" ).append('<p></p>');
 						if (thesap > trimfloat(tdistr(list1count+list2count-2,.025),4)) {
-							//alert("Ortalamalar arasında fark vardır Bağlantılıdır MCAR değildir. ");
+							$( "div#result" ).append('<p> Thesap:'+thesap + ' > Ttablo:' + trimfloat(tdistr(list1count+list2count-2,.025),4)+ ' sonucuna ulaşıldı. </p> <p> Hesap değeri tablo değerinden büyük olduğu için ortalamalar arasında fark vardır. Bu durumda kayıp verilerin '+ ht.getColHeader(fullColID) +' sütunu için MCAR yapıda olmadığına karar verildi.</p>');
 							dataStructure = "noneMCAR";
 						}
 						else {
-							//alert("Ortalamalar arasında fark yoktur Bu durumda bağımsızdır ve MCAR dır.");	
+							$( "div#result" ).append('<p> Thesap:'+thesap + ' < Ttablo:' + trimfloat(tdistr(list1count+list2count-2,.025),4)+ ' sonucuna ulaşıldı. </p> <p> Hesap değeri tablo değerinden küçük olduğu için ortalamalar arasında fark yoktur. Bu durumda kayıp verilerin '+ ht.getColHeader(fullColID) +' sütunu için MCAR yapıda olduğuna karar verildi.</p>');
 						}
 						
 						
 					}
 					//Sınıflanmış veri ise Ki-Kare Testi Uygulanıyor
-					else if (collListOptions[fullColID]['status'] == "siniflanmis") {
-						//alert (emptyColID + " ile " + fullColID + "arasında ki-kare testi uygulanacak");
+					else if (collListOptions[fullColOrderID]['status'] == "siniflanmis") {
+						$( "div#result" ).append('<p>'+ht.getColHeader(fullColID)+' sütunundaki veriler sınıflanmış veri olduğu için ' + ht.getColHeader(emptyColID) + ' ile ' + ht.getColHeader(fullColID) + ' sütunları arasında Ki-Kare testi uygulandı. </p>');
+						
 						var tableList = [];
 						
 						for(i=sel[0]; i<=sel[2];i++){
@@ -532,16 +540,17 @@
 						var degreesFreedom = (tableList.length-1)-1;
 						
 						kiHesap = Number(parseFloat(trimfloat(kiHesap,4)).toFixed(4));
-						//alert("Ki-Kare hesap değeri: " + kiHesap);
-						//alert("Ki-Kare tablo değeri: " + trimfloat(critchi(degreesFreedom, .05),4));
+						
 						
 						if (kiHesap > trimfloat(critchi(4, .05),4)) {
-							//alert("İlişki vardır. Bağımlıdır. MCAR değildir.");
+								$( "div#result" ).append('<p> Ki-Kare Hesap:'+kiHesap + ' > Ki-Kare Tablo:' + trimfloat(critchi(4, .05),4)+ ' sonucuna ulaşıldı. </p> <p> Hesap değeri tablo değerinden büyük olduğu için iki veri arasında ilişki vardır. Bu durumda kayıp verilerin '+ ht.getColHeader(fullColID) +' sütunu için MCAR yapıda olmadığına karar verildi.</p>');
+							
 							dataStructure = "noneMCAR";
 							
 						}
 						else {
-							//alert("İlişki yoktur. Bağımsızdır. MCAR dır.");
+							$( "div#result" ).append('<p> Ki-Kare Hesap:'+kiHesap + ' < Ki-Kare Tablo:' + trimfloat(critchi(4, .05),4)+ ' sonucuna ulaşıldı. </p> <p> Hesap değeri tablo değerinden küçük olduğu için iki veri arasında ilişki yoktur. Bu durumda kayıp verilerin '+ ht.getColHeader(fullColID) +' sütunu için MCAR yapıda olduğuna karar verildi.</p>');
+							
 							}
 					}
 					// Hata durumu varsayımı
@@ -555,18 +564,12 @@
 				if (dataStructure == "MCAR") {
 					//alert(ht.getColHeader(emptyColID) + " sütunundaki veriler MCAR dır.");
 					$('#analizAyarlari').append("<h2 style=\"font-size:13px; margin:5px 0 0 0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler MCAR yapıdadır.</h2>");
-					/*$('#analizAyarlari').append("\
-					<p style=\"margin:0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler tamamen rastlantısal kayıptır ve bu sütun için;</p>\
-					<ul>\
-					<li style=\"font-size:12px;\">1. .........</li>\
-					<li style=\"font-size:12px;\">2. ..........</li>\
-					</ul>\
-					<p style=\"font-size:12px; margin:0;\">testlerinden biri uygulanmalıdır.</p>\
-					");
-					*/
+					$( "div#result" ).append('<p><b>'+ ht.getColHeader(emptyColID) +' Sütunu için Sonuç:</b> '+ ht.getColHeader(emptyColID) +' sütunundaki kayıp veriler için tüm dolu sütunlarla karşılaştırma yapılmış ve tümüyle bağımsız olduğu gözlenmiştir. Bu nedenle  <b>'+ ht.getColHeader(emptyColID) +' sütunundaki kayıp veriler MCAR yapıdadır.</b></p>');
+							
+					
 					}
 				else {
-					//alert("Run testi uygulanacak");
+					$( "div#result" ).append('<p> '+ ht.getColHeader(emptyColID) +' sütunundaki kayıp veriler için tüm dolu sütunlarla karşılaştırma yapılmış ve en az bir veri seti ile ilişkili olduğu gözlenmiştir. Bu nedenle veri setinin MCAR yapıda olmadığına karar verilmiştir. <b>'+ ht.getColHeader(emptyColID) +' sütunundaki kayıp veriler için rastlantısal olma veya rastlantısal olmama durumuna karar verilmesi için kendi içinde rastgele dağılıp dağılmadığı Dizi Parçaları(Run) testi ile incelendi.</b></p>');
 					
 					var durum="";
 					var n1 = 0 ;
@@ -602,10 +605,15 @@
 						if (rAlt<rhesap & rhesap<rUst) {
 							//alert ("kayıp verilerin dizilişi rastgeledir. MAR yapıdadır");
 							$('#analizAyarlari').append("<h2 style=\"font-size:13px; margin:5px 0 0 0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler MAR yapıdadır.</h2>");
+							$( "div#result" ).append('<p> Rhesap:'+ rhesap +', Tablo Alt Sınırı:'+rAlt+' ve Tablo Üst Sınırı:'+rUst+' olarak gözlendi.</p> <p>Hesap değerinin tablo alt ve üst sınırları arasında olduğu gözlenmiştir. Bu nedenle <b>'+ ht.getColHeader(emptyColID) +' sütunundaki kayıp verilerin kendi içinde rastlantısal olarak dağılmamıştır.</b></p>');
+							
+							$( "div#result" ).append('<p><b>'+ ht.getColHeader(emptyColID) +' Veriler için Sonuç:</b>'+ ht.getColHeader(emptyColID) +' sütunundaki veriler kendi içersinde rastgele dağılmadığı için <b>kayıp veri yapısının rastlantısal olmayan(MNAR) yapıda olduğuna karar verilmiştir.</b></p>');
 						}
 						else {
 							//alert("rastgele değildir MNAR yapıdadır.");
-							$('#analizAyarlari').append("<h2 style=\"font-size:13px; margin:5px 0 0 0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler MNAR yapıdadır.</h2>");	
+							$('#analizAyarlari').append("<h2 style=\"font-size:13px; margin:5px 0 0 0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler MNAR yapıdadır.</h2>");
+							$( "div#result" ).append('<p> Rhesap:'+ rhesap +', Tablo Alt Sınırı:'+rAlt+' ve Tablo Üst Sınırı:'+rUst+' olarak gözlendi.</p> <p>Hesap değerinin tablo alt ve üst sınırları dışında olduğu gözlenmiştir. Bu nedenle <b>'+ ht.getColHeader(emptyColID) +' sütunundaki kayıp veriler kendi içinde rastlantısal olarak dağılmaktadır.</b></p>');
+							$( "div#result" ).append('<p><b>'+ ht.getColHeader(emptyColID) +' Veriler için Sonuç:</b>'+ ht.getColHeader(emptyColID) +' sütunundaki veriler kendi içersinde rastgele dağıldığı için <b>kayıp veri yapısının Rastlantısal(MAR) yapıda olduğuna karar verilmiştir.</b></p>');
 						}
 						
 					}
@@ -618,10 +626,15 @@
 						if (rAlt<rhesap & rhesap<rUst) {
 							//alert ("kayıp verilerin dizilişi rastgeledir. MAR yapıdadır");
 							$('#analizAyarlari').append("<h2 style=\"font-size:13px; margin:5px 0 0 0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler MAR yapıdadır.</h2>");
+							$( "div#result" ).append('<p> Rhesap:'+ rhesap +', Tablo Alt Sınırı:'+rAlt+' ve Tablo Üst Sınırı:'+rUst+' olarak gözlendi.</p> <p>Hesap değerinin tablo alt ve üst sınırları arasında olduğu gözlenmiştir. Bu nedenle <b>'+ ht.getColHeader(emptyColID) +' sütunundaki kayıp verilerin kendi içinde rastlantısal olarak dağılmamıştır.</b></p>');
+							
+							$( "div#result" ).append('<p><b>'+ ht.getColHeader(emptyColID) +' Veriler için Sonuç:</b>'+ ht.getColHeader(emptyColID) +' sütunundaki veriler kendi içersinde rastgele dağılmadığı için <b>kayıp veri yapısının rastlantısal olmayan(MNAR) yapıda olduğuna karar verilmiştir.</b></p>');
 						}
 						else {
 							//alert("rastgele değildir MNAR yapıdadır.");
-							$('#analizAyarlari').append("<h2 style=\"font-size:13px; margin:5px 0 0 0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler MNAR yapıdadır.</h2>");	
+							$('#analizAyarlari').append("<h2 style=\"font-size:13px; margin:5px 0 0 0;\">"+ ht.getColHeader(emptyColID) + " sütunundaki veriler MNAR yapıdadır.</h2>");
+							$( "div#result" ).append('<p> Rhesap:'+ rhesap +', Tablo Alt Sınırı:'+rAlt+' ve Tablo Üst Sınırı:'+rUst+' olarak gözlendi.</p> <p>Hesap değerinin tablo alt ve üst sınırları dışında olduğu gözlenmiştir. Bu nedenle <b>'+ ht.getColHeader(emptyColID) +' sütunundaki kayıp veriler kendi içinde rastlantısal olarak dağılmaktadır.</b></p>');
+							$( "div#result" ).append('<p><b>'+ ht.getColHeader(emptyColID) +' Veriler için Sonuç:</b>'+ ht.getColHeader(emptyColID) +' sütunundaki veriler kendi içersinde rastgele dağıldığı için <b>kayıp veri yapısının Rastlantısal(MAR) yapıda olduğuna karar verilmiştir.</b></p>');
 						}
 						
 						
@@ -633,6 +646,7 @@
 			  
 			 });
 			$('#raporuIncele').show(); 
+			$('#result').hide(); 
 			 
 		}
 		else {alert("Kullanılacak olan tüm sütunlar için soruları yanıtlamalısınız.");}
